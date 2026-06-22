@@ -171,9 +171,11 @@ const closeModal = document.getElementById("closeModal");
 const form = document.getElementById("registerForm");
 const success = document.getElementById("successMessage");
 // Відкрити форму
-openModal.addEventListener("click", function(e){
+button.addEventListener("click", function(e){
 
     e.preventDefault();
+
+    success.classList.remove("active");
 
     modal.classList.add("active");
 
