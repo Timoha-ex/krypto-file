@@ -246,18 +246,20 @@ form.addEventListener("submit", async function(e){
     });
 
     form.reset();
-    form.style.display = "none";
+    document.getElementById("formContent").style.display = "none";
     success.classList.add("active");
 
     success.classList.add("active");
 
     setTimeout(() => {
 
-        success.classList.remove("active");
+    success.classList.remove("active");
 
-        modal.classList.remove("active");
+    document.getElementById("formContent").style.display = "block";
 
-    }, 3000);
+    modal.classList.remove("active");
+
+}, 3000);
 
 }
 
