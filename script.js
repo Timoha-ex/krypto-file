@@ -220,7 +220,7 @@ openButtons.forEach(button => {
     });
 
 });
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwSx00uwfuFyRr9zxMR5JwWzDonCmAJMauulP_YGH5XNTXQ9VJmDGWv4BTqr3gS2Rob/exec";
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse";
 
 form.addEventListener("submit", async function(e){
 
@@ -231,35 +231,19 @@ form.addEventListener("submit", async function(e){
     submitBtn.disabled = true;
     submitBtn.textContent = "Відправляємо...";
 
-    const data = {
+    const formData = new FormData();
 
-        name: document.getElementById("userName").value,
-
-        phone: document.getElementById("userPhone").value,
-
-        contact: document.querySelector('input[name="contact"]:checked').value
-
-    };
+    formData.append("entry.1507431541", document.getElementById("userName").value);
+    formData.append("entry.526374724", document.getElementById("userPhone").value);
+    formData.append("entry.1622305066", document.querySelector('input[name="contact"]:checked').value);
 
     try{
 
-        const response = await fetch(SCRIPT_URL,{
-
-            method:"POST",
-
-            headers:{
-                "Content-Type":"application/json"
-            },
-
-            body:JSON.stringify(data)
-
+        await fetch(GOOGLE_FORM_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: formData
         });
-
-        if(!response.ok){
-
-            throw new Error("Помилка сервера");
-
-        }
 
         alert("✅ Заявку успішно відправлено!");
 
@@ -277,8 +261,8 @@ form.addEventListener("submit", async function(e){
 
     }
 
-    submitBtn.disabled=false;
-    submitBtn.textContent="Записатися";
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Записатися";
 
 });
 // Заявка 
