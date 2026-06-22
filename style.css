@@ -1743,7 +1743,8 @@ box-shadow:
 
     position: relative;
 
-    width: min(650px, 92vw);
+    width: min(760px, 92vw);
+    min-height: 420px;
 
     background: #0b0f14;
 
