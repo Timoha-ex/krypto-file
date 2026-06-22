@@ -213,11 +213,11 @@ openButtons.forEach(button => {
 
     button.addEventListener("click", function(e){
 
-        e.preventDefault();
+    e.preventDefault();
 
-        modal.classList.add("active");
+    success.classList.remove("active");
 
-    });
+    modal.classList.add("active");
 
 });
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse";
@@ -239,19 +239,25 @@ form.addEventListener("submit", async function(e){
 
     try{
 
-        await fetch(GOOGLE_FORM_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: formData
-        });
+    await fetch(GOOGLE_FORM_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+    });
 
-        alert("✅ Заявку успішно відправлено!");
+    form.reset();
 
-        form.reset();
+    success.classList.add("active");
+
+    setTimeout(() => {
+
+        success.classList.remove("active");
 
         modal.classList.remove("active");
 
-    }
+    }, 3000);
+
+}
 
     catch(error){
 

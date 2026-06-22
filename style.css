@@ -2074,6 +2074,106 @@ box-shadow:
 
     }
 
+}.success-message{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:40px;
+
+    background:#0b0f14;
+
+    border-radius:20px;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.35s;
+
+}
+
+.success-message.active{
+
+    opacity:1;
+
+    visibility:visible;
+
+}
+
+.success-icon{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    background:#00ff9d;
+
+    color:#08110d;
+
+    font-size:48px;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:25px;
+
+    animation:pop .4s ease;
+
+}
+
+.success-message h2{
+
+    color:#fff;
+
+    margin-bottom:12px;
+
+}
+
+.success-message p{
+
+    color:#9da8b5;
+
+    font-size:17px;
+
+}
+
+@keyframes pop{
+
+    0%{
+
+        transform:scale(.4);
+
+        opacity:0;
+
+    }
+
+    100%{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
 }
 
 .modal{display:flex!important;justify-content:center;align-items:center;z-index:999999!important;}
