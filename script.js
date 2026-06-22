@@ -220,7 +220,7 @@ openButtons.forEach(button => {
     });
 
 });
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMoOq0cCXwWFJr-UZT57EJsBLzxXAtJx7-KlQM8uG-f8PJwmmqyZol8UeovKlSPs0/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwmDXCCJZ-7LpWOYjNHC7TdcLdaCQzghxYC3xUexZoOf1dYtQvngXoj4OXGF1cvvba/exec";
 
 form.addEventListener("submit", async function(e){
 
