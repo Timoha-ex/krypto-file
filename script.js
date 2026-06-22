@@ -171,11 +171,9 @@ const closeModal = document.getElementById("closeModal");
 const form = document.getElementById("registerForm");
 const success = document.getElementById("successMessage");
 // Відкрити форму
-button.addEventListener("click", function(e){
+openModal.addEventListener("click", function(e){
 
     e.preventDefault();
-
-    success.classList.remove("active");
 
     modal.classList.add("active");
 
@@ -215,11 +213,11 @@ openButtons.forEach(button => {
 
     button.addEventListener("click", function(e){
 
-    e.preventDefault();
+        e.preventDefault();
 
-    success.classList.remove("active");
+        modal.classList.add("active");
 
-    modal.classList.add("active");
+    });
 
 });
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse";
