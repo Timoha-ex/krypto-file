@@ -246,6 +246,8 @@ form.addEventListener("submit", async function(e){
     });
 
     form.reset();
+    form.style.display = "none";
+    success.classList.add("active");
 
     success.classList.add("active");
 
