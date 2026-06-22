@@ -2074,7 +2074,9 @@ box-shadow:
 
     }
 
-}.success-message{
+}
+
+.success-message{
 
     position:absolute;
 
@@ -2102,6 +2104,7 @@ box-shadow:
 
     transition:.35s;
 
+    z-index:9999;
 }
 
 .success-message.active{
