@@ -220,5 +220,65 @@ openButtons.forEach(button => {
     });
 
 });
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMoOq0cCXwWFJr-UZT57EJsBLzxXAtJx7-KlQM8uG-f8PJwmmqyZol8UeovKlSPs0/exec";
 
+form.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const submitBtn = form.querySelector(".submit-btn");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Відправляємо...";
+
+    const data = {
+
+        name: document.getElementById("userName").value,
+
+        phone: document.getElementById("userPhone").value,
+
+        contact: document.querySelector('input[name="contact"]:checked').value
+
+    };
+
+    try{
+
+        const response = await fetch(SCRIPT_URL,{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(data)
+
+        });
+
+        if(!response.ok){
+
+            throw new Error("Помилка сервера");
+
+        }
+
+        alert("✅ Заявку успішно відправлено!");
+
+        form.reset();
+
+        modal.classList.remove("active");
+
+    }
+
+    catch(error){
+
+        alert("❌ Не вдалося відправити заявку.");
+
+        console.error(error);
+
+    }
+
+    submitBtn.disabled=false;
+    submitBtn.textContent="Записатися";
+
+});
 // Заявка 
