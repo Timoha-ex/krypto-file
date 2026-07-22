@@ -1,363 +1,43 @@
-const countdownElement = document.getElementById("countdown");
-const countdownDate = new Date("2026-07-30T23:59:59").getTime();
-
-function updateCountdown() {
-    if (!countdownElement) return;
-
-    const distance = countdownDate - Date.now();
-
-    if (distance <= 0) {
-        countdownElement.textContent = "Акцію завершено";
-        return;
-    }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    countdownElement.textContent = `${days}д ${hours}г ${minutes}хв ${seconds}с`;
-}
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
+const countdownElement=document.getElementById('countdown');
+const countdownDate=new Date('2026-07-30T23:59:59').getTime();
+function updateCountdown(){if(!countdownElement)return;const d=countdownDate-Date.now();if(d<=0){countdownElement.textContent='Акцію завершено';return;}const days=Math.floor(d/86400000),hours=Math.floor(d%86400000/3600000),minutes=Math.floor(d%3600000/60000),seconds=Math.floor(d%60000/1000);countdownElement.textContent=`${days}д ${hours}г ${minutes}хв ${seconds}с`;}
+updateCountdown();setInterval(updateCountdown,1000);
 
 // Мобільне меню та плавна прокрутка
-(() => {
-    const burger = document.getElementById("hpBurger");
-    const mobileNav = document.getElementById("hpMobileNav");
-    const closeBtn = document.getElementById("hpMobileClose");
-    const mobileLinks = document.querySelectorAll(".hp-mnav-link");
+(()=>{const burger=document.getElementById('hpBurger'),nav=document.getElementById('hpMobileNav'),close=document.getElementById('hpMobileClose');burger?.addEventListener('click',()=>nav?.classList.add('active'));close?.addEventListener('click',()=>nav?.classList.remove('active'));document.querySelectorAll('.hp-mnav-link').forEach(a=>a.addEventListener('click',()=>nav?.classList.remove('active')));document.querySelectorAll('.hp-crypto a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){const href=this.getAttribute('href');if(!href||href==='#'||href.includes('order'))return;const target=document.querySelector(href);if(!target)return;e.preventDefault();window.scrollTo({top:target.getBoundingClientRect().top+scrollY-80,behavior:'smooth'});}));})();
 
-    burger?.addEventListener("click", () => mobileNav?.classList.add("active"));
-    closeBtn?.addEventListener("click", () => mobileNav?.classList.remove("active"));
+// Кастомний курсор
+const cursor=document.getElementById('cursor');let lastTrail=0;
+function createTrail(x,y){const now=performance.now();if(now-lastTrail<25)return;lastTrail=now;const t=document.createElement('div');t.className='trail';t.style.left=x+'px';t.style.top=y+'px';document.body.appendChild(t);setTimeout(()=>t.remove(),500);}
+if(cursor&&matchMedia('(pointer: fine)').matches){document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';createTrail(e.clientX,e.clientY);});document.querySelectorAll('button,a').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.width='60px';cursor.style.height='60px';});el.addEventListener('mouseleave',()=>{cursor.style.width='28px';cursor.style.height='28px';});});document.addEventListener('mousedown',()=>cursor.style.transform='translate(-50%,-50%) scale(.75)');document.addEventListener('mouseup',()=>cursor.style.transform='translate(-50%,-50%) scale(1)');}
 
-    mobileLinks.forEach((link) => {
-        link.addEventListener("click", () => mobileNav?.classList.remove("active"));
-    });
+// Форма заявки
+const modal=document.getElementById('registerModal'),closeModalButton=document.getElementById('closeModal'),form=document.getElementById('registerForm'),formContent=document.getElementById('formContent'),successMessage=document.getElementById('successMessage');
+function openRegisterModal(e){e?.preventDefault();modal?.classList.add('active');}
+function closeRegisterModal(){modal?.classList.remove('active');}
+document.querySelectorAll('#openModal,.openModal').forEach(b=>b.addEventListener('click',openRegisterModal));closeModalButton?.addEventListener('click',closeRegisterModal);modal?.addEventListener('click',e=>{if(e.target===modal)closeRegisterModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeRegisterModal();});
+const GOOGLE_FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse';
+form?.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('.submit-btn'),contact=document.querySelector('input[name="contact"]:checked');if(!btn||!contact)return;btn.disabled=true;btn.textContent='Відправляємо...';const data=new FormData();data.append('entry.1507431541',document.getElementById('userName')?.value.trim()||'');data.append('entry.526374724',document.getElementById('userPhone')?.value.trim()||'');data.append('entry.1622305066',contact.value);try{await fetch(GOOGLE_FORM_URL,{method:'POST',mode:'no-cors',body:data});form.reset();if(formContent)formContent.style.display='none';successMessage?.classList.add('active');setTimeout(()=>{successMessage?.classList.remove('active');if(formContent)formContent.style.display='block';closeRegisterModal();},3000);}catch(err){alert('❌ Не вдалося відправити заявку. Спробуйте ще раз.');console.error(err);}finally{btn.disabled=false;btn.textContent='Записатися';}});
 
-    document.querySelectorAll('.hp-crypto a[href^="#"]').forEach((link) => {
-        link.addEventListener("click", function (event) {
-            const href = this.getAttribute("href");
+// Загальне модальне вікно для інформації
+const infoStyle=document.createElement('style');infoStyle.textContent=`
+.info-overlay{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:.24s}.info-overlay.active{opacity:1;visibility:visible}.info-window{position:relative;width:min(620px,100%);max-height:86vh;overflow:auto;padding:34px 30px;border:1px solid rgba(0,225,95,.5);border-radius:22px;background:linear-gradient(145deg,#08130d,#030806);box-shadow:0 0 60px rgba(0,220,90,.18);transform:scale(.95);transition:.24s}.info-overlay.active .info-window{transform:scale(1)}.info-close{position:absolute;right:15px;top:13px;width:40px;height:40px;border:1px solid rgba(0,225,95,.35);border-radius:50%;background:#07100a;color:#fff;font-size:24px;cursor:pointer}.info-label{color:#00df65;font-size:13px;font-weight:800;letter-spacing:.13em}.info-title{margin:10px 45px 14px 0;color:#fff;font-size:clamp(26px,6vw,36px)}.info-desc{color:#aeb8b2;font-size:17px;line-height:1.65}.info-list{list-style:none;padding:0;margin:18px 0 0}.info-list li{position:relative;padding:10px 0 10px 29px;color:#eef3f0;border-bottom:1px solid rgba(255,255,255,.06);line-height:1.45}.info-list li:before{content:'✓';position:absolute;left:0;color:#00e86b;font-weight:900}body.info-open{overflow:hidden}
+.hp-crypto__cards .hp-crypto__card{cursor:pointer;transition:.25s}.hp-crypto__cards .hp-crypto__card:hover{transform:translateY(-5px);border-color:#00dc61;box-shadow:0 14px 36px rgba(0,220,90,.14)}.hp-crypto__cards .hp-crypto__card:after{content:'Натисни, щоб дізнатися більше';display:block;margin-top:14px;color:#00d95f;font-size:12px;font-weight:700}
+.course-modules{max-width:1180px;margin:65px auto 90px;padding:0 20px}.course-modules__eyebrow{text-align:center;color:#00d75f;font-size:14px;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}.course-modules__title{text-align:center;color:#fff;font-size:clamp(34px,5vw,62px);line-height:1.05;margin:0;font-family:Georgia,serif;text-transform:uppercase}.course-modules__subtitle{text-align:center;color:#89928d;font-size:18px;margin:18px auto 40px;max-width:650px}.course-modules__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.module-card{position:relative;min-height:265px;padding:27px 23px;border:1px solid rgba(0,215,95,.28);border-radius:23px;background:linear-gradient(145deg,rgba(7,20,12,.97),rgba(2,10,6,.99));cursor:pointer;overflow:hidden;transition:.3s;color:#fff;text-align:left}.module-card:hover,.module-card:focus{transform:translateY(-6px);border-color:#00d75f;box-shadow:0 16px 45px rgba(0,215,95,.16);outline:none}.module-number{font-size:52px;font-weight:900;color:rgba(0,215,95,.22);line-height:1}.module-duration{display:inline-block;margin-top:20px;padding:7px 12px;border-radius:99px;background:rgba(0,215,95,.12);color:#00e86b;font-size:13px;font-weight:800}.module-card h3{font-size:22px;margin:17px 0 9px;color:#fff}.module-card p{margin:0;color:#87908b;line-height:1.5}.module-more{position:absolute;right:20px;bottom:17px;color:#00e86b;font-size:20px}@media(max-width:900px){.course-modules__grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.course-modules{margin:55px auto 70px;padding:0 14px}.course-modules__grid{grid-template-columns:1fr 1fr;gap:11px}.module-card{min-height:230px;padding:19px 15px;border-radius:17px}.module-number{font-size:39px}.module-card h3{font-size:17px}.module-card p{font-size:13px}.course-modules__subtitle{font-size:16px}.info-window{padding:29px 21px}.info-desc{font-size:16px}}
+`;document.head.appendChild(infoStyle);
+const overlay=document.createElement('div');overlay.className='info-overlay';overlay.innerHTML=`<div class="info-window" role="dialog" aria-modal="true"><button class="info-close" aria-label="Закрити">×</button><div class="info-label"></div><h3 class="info-title"></h3><p class="info-desc"></p><ul class="info-list"></ul></div>`;document.body.appendChild(overlay);
+function showInfo(label,title,desc,items=[]){overlay.querySelector('.info-label').textContent=label;overlay.querySelector('.info-title').textContent=title;overlay.querySelector('.info-desc').textContent=desc;const ul=overlay.querySelector('.info-list');ul.innerHTML=items.map(i=>`<li>${i}</li>`).join('');ul.style.display=items.length?'block':'none';overlay.classList.add('active');document.body.classList.add('info-open');}
+function hideInfo(){overlay.classList.remove('active');document.body.classList.remove('info-open');}
+overlay.querySelector('.info-close').addEventListener('click',hideInfo);overlay.addEventListener('click',e=>{if(e.target===overlay)hideInfo();});document.addEventListener('keydown',e=>{if(e.key==='Escape')hideInfo();});
 
-            if (!href || href === "#" || href.includes("order")) return;
+// Чотири верхні картки
+const cardInfo=[['Smart Money','Smart Money — це аналіз ринку через дії великих учасників. Ти навчишся бачити зони ліквідності, маніпуляції та місця, звідки може початися сильний рух ціни.'],['Аналіз ліквідності','Ліквідність — це зони накопичення ордерів і стоп-лосів. Їхній пошук допомагає розуміти можливі цілі ціни та уникати входів у момент маніпуляції.'],['Пошук точок входу','Якісна точка входу з’являється після підтвердження структури. Ти отримаєш алгоритм входу з логічним стоп-лосом і визначеною ціллю.'],['Управління капіталом','Ризик-менеджмент допомагає захистити депозит, контролювати втрати та зберігати стабільність на довгій дистанції.']];
+document.querySelectorAll('.hp-crypto__cards .hp-crypto__card').forEach((card,i)=>{card.tabIndex=0;const open=()=>showInfo('ЩО ЦЕ ТАКЕ?',cardInfo[i][0],cardInfo[i][1]);card.addEventListener('click',open);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});});
 
-            const target = document.querySelector(href);
-            if (!target) return;
-
-            event.preventDefault();
-            const top = target.getBoundingClientRect().top + window.scrollY - 80;
-            window.scrollTo({ top, behavior: "smooth" });
-        });
-    });
-})();
-
-// Кастомний курсор лише для пристроїв із мишею
-const cursor = document.getElementById("cursor");
-let lastTrail = 0;
-
-function createTrail(x, y) {
-    const now = performance.now();
-    if (now - lastTrail < 25) return;
-
-    lastTrail = now;
-    const trail = document.createElement("div");
-    trail.className = "trail";
-    trail.style.left = `${x}px`;
-    trail.style.top = `${y}px`;
-    document.body.appendChild(trail);
-
-    setTimeout(() => trail.remove(), 500);
-}
-
-if (cursor && window.matchMedia("(pointer: fine)").matches) {
-    document.addEventListener("mousemove", (event) => {
-        cursor.style.left = `${event.clientX}px`;
-        cursor.style.top = `${event.clientY}px`;
-        createTrail(event.clientX, event.clientY);
-    });
-
-    document.querySelectorAll("button, a").forEach((item) => {
-        item.addEventListener("mouseenter", () => {
-            cursor.style.width = "60px";
-            cursor.style.height = "60px";
-        });
-
-        item.addEventListener("mouseleave", () => {
-            cursor.style.width = "28px";
-            cursor.style.height = "28px";
-        });
-    });
-
-    document.addEventListener("mousedown", () => {
-        cursor.style.transform = "translate(-50%, -50%) scale(.75)";
-    });
-
-    document.addEventListener("mouseup", () => {
-        cursor.style.transform = "translate(-50%, -50%) scale(1)";
-    });
-}
-
-// Модальне вікно та форма заявки
-const modal = document.getElementById("registerModal");
-const closeModalButton = document.getElementById("closeModal");
-const form = document.getElementById("registerForm");
-const formContent = document.getElementById("formContent");
-const successMessage = document.getElementById("successMessage");
-const openButtons = document.querySelectorAll("#openModal, .openModal");
-
-function openRegisterModal(event) {
-    event?.preventDefault();
-    modal?.classList.add("active");
-}
-
-function closeRegisterModal() {
-    modal?.classList.remove("active");
-}
-
-openButtons.forEach((button) => button.addEventListener("click", openRegisterModal));
-closeModalButton?.addEventListener("click", closeRegisterModal);
-
-modal?.addEventListener("click", (event) => {
-    if (event.target === modal) closeRegisterModal();
-});
-
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeRegisterModal();
-});
-
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse";
-
-form?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const submitButton = form.querySelector(".submit-btn");
-    const selectedContact = document.querySelector('input[name="contact"]:checked');
-
-    if (!submitButton || !selectedContact) return;
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Відправляємо...";
-
-    const formData = new FormData();
-    formData.append("entry.1507431541", document.getElementById("userName")?.value.trim() || "");
-    formData.append("entry.526374724", document.getElementById("userPhone")?.value.trim() || "");
-    formData.append("entry.1622305066", selectedContact.value);
-
-    try {
-        await fetch(GOOGLE_FORM_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: formData
-        });
-
-        form.reset();
-        if (formContent) formContent.style.display = "none";
-        successMessage?.classList.add("active");
-
-        setTimeout(() => {
-            successMessage?.classList.remove("active");
-            if (formContent) formContent.style.display = "block";
-            closeRegisterModal();
-        }, 3000);
-    } catch (error) {
-        alert("❌ Не вдалося відправити заявку. Спробуйте ще раз.");
-        console.error(error);
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Записатися";
-    }
-});
-
-// Клікабельні картки програми з коротким поясненням
-(() => {
-    const cards = document.querySelectorAll(".hp-crypto__cards .hp-crypto__card");
-    if (!cards.length) return;
-
-    const cardInfo = [
-        {
-            title: "Smart Money",
-            text: "Smart Money — це підхід до аналізу ринку через дії великих учасників: банків, фондів і маркетмейкерів. Ти навчишся бачити, де вони збирають ліквідність і звідки може початися сильний рух ціни."
-        },
-        {
-            title: "Аналіз ліквідності",
-            text: "Ліквідність — це зони, де накопичено багато ордерів і стоп-лосів. Їхній пошук допомагає розуміти, куди ціна може піти перед справжнім рухом і де ринок найчастіше робить маніпуляції."
-        },
-        {
-            title: "Пошук точок входу",
-            text: "Точка входу формується не за емоціями, а після підтвердження структури ринку. Ти отримаєш чіткий алгоритм входу з логічним стоп-лосом і зрозумілою ціллю."
-        },
-        {
-            title: "Управління капіталом",
-            text: "Ризик-менеджмент визначає, якою частиною депозиту можна ризикувати в одній угоді. Головна мета — захистити капітал, уникати великих просадок і залишатися стабільним на дистанції."
-        }
-    ];
-
-    const style = document.createElement("style");
-    style.textContent = `
-        .hp-crypto__cards .hp-crypto__card {
-            cursor: pointer;
-            position: relative;
-            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
-        }
-        .hp-crypto__cards .hp-crypto__card:hover,
-        .hp-crypto__cards .hp-crypto__card:focus-visible {
-            transform: translateY(-5px);
-            border-color: rgba(0, 255, 102, .75);
-            box-shadow: 0 14px 38px rgba(0, 220, 90, .15);
-            outline: none;
-        }
-        .hp-crypto__cards .hp-crypto__card::after {
-            content: "Натисни, щоб дізнатися більше";
-            display: block;
-            margin-top: 14px;
-            color: #00d95f;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .03em;
-            opacity: .8;
-        }
-        .program-info-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 10050;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, .78);
-            backdrop-filter: blur(8px);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity .22s ease, visibility .22s ease;
-        }
-        .program-info-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .program-info-modal__window {
-            width: min(520px, 100%);
-            position: relative;
-            padding: 34px 28px 30px;
-            border: 1px solid rgba(0, 230, 95, .5);
-            border-radius: 20px;
-            background: linear-gradient(145deg, #08120c, #040806);
-            box-shadow: 0 0 60px rgba(0, 220, 90, .18);
-            transform: translateY(18px) scale(.97);
-            transition: transform .22s ease;
-        }
-        .program-info-modal.active .program-info-modal__window {
-            transform: translateY(0) scale(1);
-        }
-        .program-info-modal__close {
-            position: absolute;
-            top: 12px;
-            right: 14px;
-            width: 38px;
-            height: 38px;
-            border: 1px solid rgba(0, 230, 95, .35);
-            border-radius: 50%;
-            background: rgba(0, 0, 0, .35);
-            color: #fff;
-            font-size: 22px;
-            line-height: 1;
-            cursor: pointer;
-        }
-        .program-info-modal__label {
-            margin: 0 0 8px;
-            color: #00df65;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-        }
-        .program-info-modal__title {
-            margin: 0 42px 16px 0;
-            color: #fff;
-            font-size: clamp(25px, 6vw, 36px);
-            line-height: 1.12;
-        }
-        .program-info-modal__text {
-            margin: 0;
-            color: #b6c1ba;
-            font-size: 17px;
-            line-height: 1.65;
-        }
-        body.program-modal-open {
-            overflow: hidden;
-        }
-        @media (max-width: 600px) {
-            .program-info-modal__window {
-                padding: 30px 22px 26px;
-                border-radius: 16px;
-            }
-            .program-info-modal__text {
-                font-size: 16px;
-            }
-            .hp-crypto__cards .hp-crypto__card::after {
-                font-size: 11px;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-
-    const infoModal = document.createElement("div");
-    infoModal.className = "program-info-modal";
-    infoModal.setAttribute("aria-hidden", "true");
-    infoModal.innerHTML = `
-        <div class="program-info-modal__window" role="dialog" aria-modal="true" aria-labelledby="programInfoTitle">
-            <button class="program-info-modal__close" type="button" aria-label="Закрити">×</button>
-            <p class="program-info-modal__label">Що це таке?</p>
-            <h3 class="program-info-modal__title" id="programInfoTitle"></h3>
-            <p class="program-info-modal__text"></p>
-        </div>
-    `;
-    document.body.appendChild(infoModal);
-
-    const titleElement = infoModal.querySelector(".program-info-modal__title");
-    const textElement = infoModal.querySelector(".program-info-modal__text");
-    const closeButton = infoModal.querySelector(".program-info-modal__close");
-
-    function openInfoModal(index) {
-        const info = cardInfo[index];
-        if (!info || !titleElement || !textElement) return;
-
-        titleElement.textContent = info.title;
-        textElement.textContent = info.text;
-        infoModal.classList.add("active");
-        infoModal.setAttribute("aria-hidden", "false");
-        document.body.classList.add("program-modal-open");
-        closeButton?.focus();
-    }
-
-    function closeInfoModal() {
-        infoModal.classList.remove("active");
-        infoModal.setAttribute("aria-hidden", "true");
-        document.body.classList.remove("program-modal-open");
-    }
-
-    cards.forEach((card, index) => {
-        card.setAttribute("role", "button");
-        card.setAttribute("tabindex", "0");
-        card.setAttribute("aria-label", `Дізнатися більше: ${cardInfo[index]?.title || "тема програми"}`);
-
-        card.addEventListener("click", () => openInfoModal(index));
-        card.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                openInfoModal(index);
-            }
-        });
-    });
-
-    closeButton?.addEventListener("click", closeInfoModal);
-    infoModal.addEventListener("click", (event) => {
-        if (event.target === infoModal) closeInfoModal();
-    });
-
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && infoModal.classList.contains("active")) {
-            closeInfoModal();
-        }
-    });
-})();
+// Чотири модулі навчання
+(()=>{const faq=Array.from(document.querySelectorAll('details'))[0]?.parentElement;if(!faq||document.getElementById('courseModules'))return;const modules=[
+{n:'01',title:'Основи криптовалюти',duration:'2 дні',desc:'Теорія та практика роботи з криптовалютною інфраструктурою.',items:['Робота з криптовалютними біржами','Реєстрація та базове налаштування акаунтів','Гарячі та холодні гаманці','Безпечне зберігання активів','Поповнення рахунку та виведення коштів','Практичне виконання основних операцій']},
+{n:'02',title:'Інструменти трейдера',duration:'2 дні',desc:'Готуємо повноцінне робоче місце для аналізу та торгівлі.',items:['Завантаження всіх необхідних програм','Налаштування TradingView та допоміжних сервісів','Робота з CoinMarketCap і Coinglass','Налаштування біржі та Telegram','Практика з кожним інструментом','Подарунки й матеріали для успішного старту']},
+{n:'03',title:'Smart Money',duration:'4 дні',desc:'Поглиблене навчання аналізу ринку за концепцією Smart Money.',items:['Структура ринку','BOS і CHoCH','Ліквідність та маніпуляції','Order Blocks і Fair Value Gaps','Пошук якісних точок входу','Максимум теорії та практика на реальних графіках']},
+{n:'04',title:'Трейдинг як професія',duration:'Практика',desc:'Переходимо від навчання до системної самостійної торгівлі.',items:['Разом шукаємо торгові позиції','Проводимо повний аналіз перед входом','Входимо в угоди за чітким алгоритмом','Встановлюємо Stop Loss і Take Profit','Працюємо з ризик-менеджментом','Формуємо торговий план і професійний підхід']}
+];const section=document.createElement('section');section.className='course-modules';section.id='courseModules';section.innerHTML=`<div class="course-modules__eyebrow">Повна програма</div><h2 class="course-modules__title">Що буде на навчанні</h2><p class="course-modules__subtitle">4 модулі — від перших кроків у крипті до системної торгівлі</p><div class="course-modules__grid">${modules.map((m,i)=>`<button class="module-card" type="button" data-i="${i}"><div class="module-number">${m.n}</div><span class="module-duration">${m.duration}</span><h3>${m.title}</h3><p>${m.desc}</p><span class="module-more">↗</span></button>`).join('')}</div>`;faq.insertAdjacentElement('afterend',section);section.querySelectorAll('.module-card').forEach(card=>card.addEventListener('click',()=>{const m=modules[+card.dataset.i];showInfo(`МОДУЛЬ ${m.n} • ${m.duration}`,m.title,m.desc,m.items);}));})();
