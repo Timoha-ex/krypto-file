@@ -1,11 +1,13 @@
+const countdownElement = document.getElementById("countdown");
 const countdownDate = new Date("2026-07-30T23:59:59").getTime();
 
 function updateCountdown() {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
+    if (!countdownElement) return;
 
-    if (distance < 0) {
-        document.getElementById("countdown").innerHTML = "Акцію завершено";
+    const distance = countdownDate - Date.now();
+
+    if (distance <= 0) {
+        countdownElement.textContent = "Акцію завершено";
         return;
     }
 
@@ -14,265 +16,155 @@ function updateCountdown() {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    document.getElementById("countdown").innerHTML =
-        days + "д " +
-        hours + "г " +
-        minutes + "хв " +
-        seconds + "с";
+    countdownElement.textContent = `${days}д ${hours}г ${minutes}хв ${seconds}с`;
 }
 
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-(function () {
-    var burger = document.getElementById("hpBurger");
-    var mobileNav = document.getElementById("hpMobileNav");
-    var closeBtn = document.getElementById("hpMobileClose");
-    var links = document.querySelectorAll(".hp-mnav-link");
+// Мобільне меню та плавна прокрутка
+(() => {
+    const burger = document.getElementById("hpBurger");
+    const mobileNav = document.getElementById("hpMobileNav");
+    const closeBtn = document.getElementById("hpMobileClose");
+    const mobileLinks = document.querySelectorAll(".hp-mnav-link");
 
-    if (burger) {
-        burger.addEventListener("click", function () {
-            mobileNav.classList.add("active");
+    burger?.addEventListener("click", () => mobileNav?.classList.add("active"));
+    closeBtn?.addEventListener("click", () => mobileNav?.classList.remove("active"));
+
+    mobileLinks.forEach((link) => {
+        link.addEventListener("click", () => mobileNav?.classList.remove("active"));
+    });
+
+    document.querySelectorAll('.hp-crypto a[href^="#"]').forEach((link) => {
+        link.addEventListener("click", function (event) {
+            const href = this.getAttribute("href");
+
+            if (!href || href === "#" || href.includes("order")) return;
+
+            const target = document.querySelector(href);
+            if (!target) return;
+
+            event.preventDefault();
+            const top = target.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top, behavior: "smooth" });
         });
-    }
-
-    if (closeBtn) {
-        closeBtn.addEventListener("click", function () {
-            mobileNav.classList.remove("active");
-        });
-    }
-
-    for (var i = 0; i < links.length; i++) {
-        links[i].addEventListener("click", function () {
-            mobileNav.classList.remove("active");
-        });
-    }
-
-    // Плавна прокрутка до секцій
-    var allLinks = document.querySelectorAll('.hp-crypto a[href^="#"]');
-
-    for (var j = 0; j < allLinks.length; j++) {
-        allLinks[j].addEventListener("click", function (e) {
-            var href = this.getAttribute("href");
-
-            if (
-                href &&
-                href.charAt(0) === "#" &&
-                href.length > 1 &&
-                href.indexOf("order") === -1
-            ) {
-                var target = document.querySelector(href);
-
-                if (target) {
-                    e.preventDefault();
-
-                    var offset = 80;
-                    var top =
-                        target.getBoundingClientRect().top +
-                        window.pageYOffset -
-                        offset;
-
-                    window.scrollTo({
-                        top: top,
-                        behavior: "smooth"
-                    });
-                }
-            }
-        });
-    }
+    });
 })();
 
-
-
-
+// Кастомний курсор лише для пристроїв із мишею
 const cursor = document.getElementById("cursor");
-
-let mouseX = 0;
-let mouseY = 0;
-
-
-
-document.addEventListener("mousemove",(e)=>{
-
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-
-    cursor.style.left = e.clientX + "px";
-    cursor.style.top = e.clientY + "px";
-    createTrail(e.clientX, e.clientY);
-
-});
-
-
-const hoverItems = document.querySelectorAll("button, a");
-
-hoverItems.forEach(item=>{
-
-    item.addEventListener("mouseenter",()=>{
-
-        cursor.style.width="60px";
-        cursor.style.height="60px";
-
-    });
-
-    item.addEventListener("mouseleave",()=>{
-
-        cursor.style.width="28px";
-        cursor.style.height="28px";
-
-    });
-
-});
-document.addEventListener("mousedown",()=>{
-
-    cursor.style.transform =
-    "translate(-50%,-50%) scale(.75)";
-
-});
-
-document.addEventListener("mouseup",()=>{
-
-    cursor.style.transform =
-    "translate(-50%,-50%) scale(1)";
-
-});
-
 let lastTrail = 0;
 
-function createTrail(x, y){
-
+function createTrail(x, y) {
     const now = performance.now();
-
-    if(now - lastTrail < 25) return;
+    if (now - lastTrail < 25) return;
 
     lastTrail = now;
-
     const trail = document.createElement("div");
-
     trail.className = "trail";
-
-    trail.style.left = x + "px";
-    trail.style.top = y + "px";
-
+    trail.style.left = `${x}px`;
+    trail.style.top = `${y}px`;
     document.body.appendChild(trail);
 
-    setTimeout(()=>{
-
-        trail.remove();
-
-    },500);
-
+    setTimeout(() => trail.remove(), 500);
 }
-// Заявка 
 
-const openModal = document.getElementById("openModal");
-const modal = document.getElementById("registerModal");
-const closeModal = document.getElementById("closeModal");
-const form = document.getElementById("registerForm");
-const success = document.getElementById("successMessage");
-// Відкрити форму
-openModal.addEventListener("click", function(e){
-
-    e.preventDefault();
-
-    modal.classList.add("active");
-
-});
-
-// Закрити по хрестику
-closeModal.addEventListener("click", function(){
-
-    modal.classList.remove("active");
-
-});
-
-// Закрити при кліку по темному фону
-modal.addEventListener("click", function(e){
-
-    if(e.target === modal){
-
-        modal.classList.remove("active");
-
-    }
-
-});
-
-// Закрити клавішею Esc
-document.addEventListener("keydown", function(e){
-
-    if(e.key === "Escape"){
-
-        modal.classList.remove("active");
-
-    }
-
-});
-const openButtons = document.querySelectorAll(".openModal");
-
-openButtons.forEach(button => {
-
-    button.addEventListener("click", function(e){
-
-        e.preventDefault();
-
-        modal.classList.add("active");
-
+if (cursor && window.matchMedia("(pointer: fine)").matches) {
+    document.addEventListener("mousemove", (event) => {
+        cursor.style.left = `${event.clientX}px`;
+        cursor.style.top = `${event.clientY}px`;
+        createTrail(event.clientX, event.clientY);
     });
 
+    document.querySelectorAll("button, a").forEach((item) => {
+        item.addEventListener("mouseenter", () => {
+            cursor.style.width = "60px";
+            cursor.style.height = "60px";
+        });
+
+        item.addEventListener("mouseleave", () => {
+            cursor.style.width = "28px";
+            cursor.style.height = "28px";
+        });
+    });
+
+    document.addEventListener("mousedown", () => {
+        cursor.style.transform = "translate(-50%, -50%) scale(.75)";
+    });
+
+    document.addEventListener("mouseup", () => {
+        cursor.style.transform = "translate(-50%, -50%) scale(1)";
+    });
+}
+
+// Модальне вікно та форма заявки
+const modal = document.getElementById("registerModal");
+const closeModalButton = document.getElementById("closeModal");
+const form = document.getElementById("registerForm");
+const formContent = document.getElementById("formContent");
+const successMessage = document.getElementById("successMessage");
+const openButtons = document.querySelectorAll("#openModal, .openModal");
+
+function openRegisterModal(event) {
+    event?.preventDefault();
+    modal?.classList.add("active");
+}
+
+function closeRegisterModal() {
+    modal?.classList.remove("active");
+}
+
+openButtons.forEach((button) => button.addEventListener("click", openRegisterModal));
+closeModalButton?.addEventListener("click", closeRegisterModal);
+
+modal?.addEventListener("click", (event) => {
+    if (event.target === modal) closeRegisterModal();
 });
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeRegisterModal();
+});
+
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse";
 
-form.addEventListener("submit", async function(e){
+form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-    e.preventDefault();
+    const submitButton = form.querySelector(".submit-btn");
+    const selectedContact = document.querySelector('input[name="contact"]:checked');
 
-    const submitBtn = form.querySelector(".submit-btn");
+    if (!submitButton || !selectedContact) return;
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Відправляємо...";
+    submitButton.disabled = true;
+    submitButton.textContent = "Відправляємо...";
 
     const formData = new FormData();
+    formData.append("entry.1507431541", document.getElementById("userName")?.value.trim() || "");
+    formData.append("entry.526374724", document.getElementById("userPhone")?.value.trim() || "");
+    formData.append("entry.1622305066", selectedContact.value);
 
-    formData.append("entry.1507431541", document.getElementById("userName").value);
-    formData.append("entry.526374724", document.getElementById("userPhone").value);
-    formData.append("entry.1622305066", document.querySelector('input[name="contact"]:checked').value);
+    try {
+        await fetch(GOOGLE_FORM_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: formData
+        });
 
-    try{
+        form.reset();
+        if (formContent) formContent.style.display = "none";
+        successMessage?.classList.add("active");
 
-    await fetch(GOOGLE_FORM_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData
-    });
-
-    form.reset();
-    document.getElementById("formContent").style.display = "none";
-    success.classList.add("active");
-
-    success.classList.add("active");
-
-    setTimeout(() => {
-
-    success.classList.remove("active");
-
-    document.getElementById("formContent").style.display = "block";
-
-    modal.classList.remove("active");
-
-}, 3000);
-
-}
-
-    catch(error){
-
-        alert("❌ Не вдалося відправити заявку.");
-
+        setTimeout(() => {
+            successMessage?.classList.remove("active");
+            if (formContent) formContent.style.display = "block";
+            closeRegisterModal();
+        }, 3000);
+    } catch (error) {
+        alert("❌ Не вдалося відправити заявку. Спробуйте ще раз.");
         console.error(error);
-
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Записатися";
     }
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Записатися";
-
 });
-// Заявка 
