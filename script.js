@@ -1,3 +1,13 @@
+// Забороняємо горизонтальне перетягування сторінки на мобільних пристроях
+const layoutLockStyle=document.createElement('style');layoutLockStyle.textContent=`
+html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behavior-x:none;touch-action:pan-y pinch-zoom}
+body{position:relative}
+.hp-crypto{width:100%;max-width:100%;overflow-x:clip}
+img,video,iframe,svg{max-width:100%}
+*{box-sizing:border-box}
+@supports(overflow:clip){html,body{overflow-x:clip!important}}
+`;document.head.appendChild(layoutLockStyle);
+
 const countdownElement=document.getElementById('countdown');
 const countdownDate=new Date('2026-07-30T23:59:59').getTime();
 function updateCountdown(){if(!countdownElement)return;const d=countdownDate-Date.now();if(d<=0){countdownElement.textContent='Акцію завершено';return;}const days=Math.floor(d/86400000),hours=Math.floor(d%86400000/3600000),minutes=Math.floor(d%3600000/60000),seconds=Math.floor(d%60000/1000);countdownElement.textContent=`${days}д ${hours}г ${minutes}хв ${seconds}с`;}
