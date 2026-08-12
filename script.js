@@ -9,7 +9,7 @@ img,video,iframe,svg{max-width:100%}
 `;document.head.appendChild(layoutLockStyle);
 
 const countdownElement=document.getElementById('countdown');
-const countdownDate=new Date('2026-07-30T23:59:59').getTime();
+const countdownDate=new Date('2026-08-30T23:59:59').getTime();
 function updateCountdown(){if(!countdownElement)return;const d=countdownDate-Date.now();if(d<=0){countdownElement.textContent='Акцію завершено';return;}const days=Math.floor(d/86400000),hours=Math.floor(d%86400000/3600000),minutes=Math.floor(d%3600000/60000),seconds=Math.floor(d%60000/1000);countdownElement.textContent=`${days}д ${hours}г ${minutes}хв ${seconds}с`;}
 updateCountdown();setInterval(updateCountdown,1000);
 
