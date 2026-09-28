@@ -8,6 +8,14 @@ img,video,iframe,svg{max-width:100%}
 @supports(overflow:clip){html,body{overflow-x:clip!important}}
 `;document.head.appendChild(layoutLockStyle);
 
+// Meta Pixel: add the Pixel ID here when it is available.
+const META_PIXEL_ID = '';
+if (META_PIXEL_ID) {
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=true;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=true;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+}
+
 const countdownElement=document.getElementById('countdown');
 const countdownDate=new Date('2026-10-19T23:59:59').getTime();
 function updateCountdown(){if(!countdownElement)return;const d=countdownDate-Date.now();if(d<=0){countdownElement.textContent='Акцію завершено';return;}const days=Math.floor(d/86400000),hours=Math.floor(d%86400000/3600000),minutes=Math.floor(d%3600000/60000),seconds=Math.floor(d%60000/1000);countdownElement.textContent=`${days}д ${hours}г ${minutes}хв ${seconds}с`;}
@@ -27,7 +35,7 @@ function openRegisterModal(e){e?.preventDefault();modal?.classList.add('active')
 function closeRegisterModal(){modal?.classList.remove('active');}
 document.querySelectorAll('#openModal,.openModal').forEach(b=>b.addEventListener('click',openRegisterModal));closeModalButton?.addEventListener('click',closeRegisterModal);modal?.addEventListener('click',e=>{if(e.target===modal)closeRegisterModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeRegisterModal();});
 const GOOGLE_FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSd6Ks1Sm09cZwJd6BsEXn9Ca7avQWwnom9d8iN2B5sITO8dYQ/formResponse';
-form?.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('.submit-btn'),contact=document.querySelector('input[name="contact"]:checked');if(!btn||!contact)return;btn.disabled=true;btn.textContent='Відправляємо...';const data=new FormData();data.append('entry.1507431541',document.getElementById('userName')?.value.trim()||'');data.append('entry.526374724',document.getElementById('userPhone')?.value.trim()||'');data.append('entry.1622305066',contact.value);try{await fetch(GOOGLE_FORM_URL,{method:'POST',mode:'no-cors',body:data});form.reset();if(formContent)formContent.style.display='none';successMessage?.classList.add('active');setTimeout(()=>{successMessage?.classList.remove('active');if(formContent)formContent.style.display='block';closeRegisterModal();},3000);}catch(err){alert('❌ Не вдалося відправити заявку. Спробуйте ще раз.');console.error(err);}finally{btn.disabled=false;btn.textContent='Записатися';}});
+form?.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('.submit-btn'),contact=document.querySelector('input[name="contact"]:checked');if(!btn||!contact)return;btn.disabled=true;btn.textContent='Відправляємо...';const data=new FormData();data.append('entry.1507431541',document.getElementById('userName')?.value.trim()||'');data.append('entry.526374724',document.getElementById('userPhone')?.value.trim()||'');data.append('entry.1622305066',contact.value);try{await fetch(GOOGLE_FORM_URL,{method:'POST',mode:'no-cors',body:data});if(typeof fbq==='function')fbq('track','Lead');form.reset();if(formContent)formContent.style.display='none';successMessage?.classList.add('active');setTimeout(()=>{successMessage?.classList.remove('active');if(formContent)formContent.style.display='block';closeRegisterModal();},3000);}catch(err){alert('❌ Не вдалося відправити заявку. Спробуйте ще раз.');console.error(err);}finally{btn.disabled=false;btn.textContent='Записатися';}});
 
 // Загальне модальне вікно для інформації
 const infoStyle=document.createElement('style');infoStyle.textContent=`
