@@ -2196,6 +2196,6 @@ box-shadow:
 /* Mobile spacing before format section */
 @media (max-width: 600px) {
   .hp-video-block {
-    margin-top: 400px !important;
+    margin-top: 300px !important;
   }
 }
