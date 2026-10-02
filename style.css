@@ -2191,3 +2191,11 @@ box-shadow:
 
 .modal{display:flex!important;justify-content:center;align-items:center;z-index:999999!important;}
 
+
+
+/* Mobile spacing before format section */
+@media (max-width: 600px) {
+  .hp-video-block {
+    margin-top: 220px !important;
+  }
+}
